@@ -1,0 +1,15 @@
+{
+  "name": "jolo-retail",
+  "version": "1.0.0",
+  "private": true,
+  "homepage": "https://Saurabh-rana-01.github.io/JOLO-Retail",
+  "devDependencies": {
+    "gh-pages": "^6.0.0"
+  },
+  "scripts": {
+    "predeploy": "npm run build",
+    "build": "react-scripts build",
+    "deploy": "gh-pages -d build",
+    "start": "npm start"
+  }
+}
