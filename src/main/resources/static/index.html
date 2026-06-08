@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JOLO Retail - Order & Inventory Management System</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS Stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- Chart.js for High-Quality Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-logo">
+                    <i class="fa-solid fa-square-poll-vertical logo-icon"></i>
+                </div>
+                <div class="brand-text">
+                    <h2>JOLO Retail</h2>
+                    <span>ROIMS Dashboard</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item active" data-target="dashboard-panel">
+                        <a href="#"><i class="fa-solid fa-chart-pie"></i> <span>Dashboard</span></a>
+                    </li>
+                    <li class="nav-item" data-target="pos-panel">
+                        <a href="#"><i class="fa-solid fa-cash-register"></i> <span>POS Terminal</span></a>
+                    </li>
+                    <li class="nav-item" data-target="inventory-panel">
+                        <a href="#"><i class="fa-solid fa-boxes-stacked"></i> <span>Inventory</span></a>
+                    </li>
+                    <li class="nav-item" data-target="customers-panel">
+                        <a href="#"><i class="fa-solid fa-users"></i> <span>Customers</span></a>
+                    </li>
+                    <li class="nav-item" data-target="orders-panel">
+                        <a href="#"><i class="fa-solid fa-receipt"></i> <span>Order History</span></a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="system-status">
+                    <span class="status-dot online"></span>
+                    <span class="status-text">Server connected</span>
+                </div>
+                <span class="version-label">v1.0.0</span>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="content-header">
+                <div class="header-title">
+                    <h1 id="page-title">Dashboard Overview</h1>
+                    <p id="page-subtitle" class="text-muted">Welcome back, Administrator. Here's your retail summary.</p>
+                </div>
+                <div class="header-actions">
+                    <div id="live-clock" class="live-clock">
+                        <i class="fa-regular fa-clock"></i> <span>--:--:--</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Panel -->
+            <section id="dashboard-panel" class="content-panel active">
+                <!-- KPI Dashboard Grid -->
+                <div class="kpi-grid">
+                    <div class="kpi-card text-glow-cyan">
+                        <div class="kpi-icon"><i class="fa-solid fa-circle-dollar-to-slot"></i></div>
+                        <div class="kpi-info">
+                            <span class="kpi-label">Total Revenue</span>
+                            <h3 id="kpi-revenue" class="kpi-value">$0.00</h3>
+                        </div>
+                    </div>
+                    <div class="kpi-card text-glow-purple">
+                        <div class="kpi-icon"><i class="fa-solid fa-cart-shopping"></i></div>
+                        <div class="kpi-info">
+                            <span class="kpi-label">Total Orders</span>
+                            <h3 id="kpi-orders" class="kpi-value">0</h3>
+                        </div>
+                    </div>
+                    <div class="kpi-card text-glow-blue">
+                        <div class="kpi-icon"><i class="fa-solid fa-user-tag"></i></div>
+                        <div class="kpi-info">
+                            <span class="kpi-label">Loyalty Members</span>
+                            <h3 id="kpi-customers" class="kpi-value">0</h3>
+                        </div>
+                    </div>
+                    <div class="kpi-card text-glow-orange cursor-pointer" id="kpi-low-stock-btn">
+                        <div class="kpi-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <div class="kpi-info">
+                            <span class="kpi-label">Low Stock Alerts</span>
+                            <h3 id="kpi-low-stock" class="kpi-value">0</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts and Lists Grid -->
+                <div class="dashboard-grid">
+                    <!-- Revenue Analytics Chart -->
+                    <div class="dashboard-card main-chart-card">
+                        <div class="card-header">
+                            <h3>Sales Trend (Net Revenue)</h3>
+                            <span class="badge badge-success">Live Updates</span>
+                        </div>
+                        <div class="card-body chart-container">
+                            <canvas id="sales-trend-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Category Breakdown -->
+                    <div class="dashboard-card category-chart-card">
+                        <div class="card-header">
+                            <h3>Category Distribution</h3>
+                        </div>
+                        <div class="card-body chart-container flex-center">
+                            <canvas id="category-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid second-row">
+                    <!-- Recent Orders List -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Recent Completed Orders</h3>
+                            <button class="btn btn-text btn-view-all-orders">View All</button>
+                        </div>
+                        <div class="card-body table-responsive">
+                            <table class="table" id="recent-orders-table">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Customer</th>
+                                        <th>Date</th>
+                                        <th>Net Amount</th>
+                                        <th>Payment</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Rendered dynamically -->
+                                    <tr><td colspan="5" class="text-center">Loading orders...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Low Stock Detail Panel -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Low Stock Warning List</h3>
+                            <button class="btn btn-text btn-go-inventory">Restock Now</button>
+                        </div>
+                        <div class="card-body product-alert-list" id="low-stock-alert-list">
+                            <!-- Rendered dynamically -->
+                            <div class="text-center text-muted pad-20">No low stock items.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- POS Terminal Panel -->
+            <section id="pos-panel" class="content-panel">
+                <div class="pos-layout">
+                    <!-- Products Grid Section -->
+                    <div class="pos-products-container">
+                        <div class="pos-filter-bar">
+                            <div class="search-input-group">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input type="text" id="pos-search" placeholder="Search catalog by name or SKU...">
+                            </div>
+                            <div class="category-filters" id="pos-category-filters">
+                                <button class="btn btn-filter active" data-category="ALL">All</button>
+                                <button class="btn btn-filter" data-category="Electronics">Electronics</button>
+                                <button class="btn btn-filter" data-category="Apparel">Apparel</button>
+                                <button class="btn btn-filter" data-category="Home & Kitchen">Home</button>
+                                <button class="btn btn-filter" data-category="Grocery">Grocery</button>
+                            </div>
+                        </div>
+                        
+                        <div class="pos-grid" id="pos-products-grid">
+                            <!-- Rendered dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Cart and Checkout Section -->
+                    <div class="pos-cart-container">
+                        <div class="pos-card-header">
+                            <h3>Active Shopping Cart</h3>
+                            <button class="btn btn-danger-outline btn-xs" id="clear-cart-btn"><i class="fa-solid fa-trash-can"></i> Clear</button>
+                        </div>
+                        
+                        <!-- Customer Attachment -->
+                        <div class="customer-attach-box">
+                            <div class="attach-header">
+                                <label><i class="fa-solid fa-user-plus"></i> Attach Customer Loyalty Profile</label>
+                            </div>
+                            <div class="attach-search">
+                                <select id="pos-customer-select">
+                                    <option value="">-- Guest Checkout --</option>
+                                    <!-- Rendered dynamically -->
+                                </select>
+                            </div>
+                            <div class="attached-customer-info hidden" id="attached-customer-badge">
+                                <div class="badge-avatar"><i class="fa-solid fa-user-astronaut"></i></div>
+                                <div class="badge-details">
+                                    <h4 id="attached-cust-name">John Doe</h4>
+                                    <p>Tier: <span id="attached-cust-tier" class="tier-pill tier-gold">GOLD</span> | Points: <span id="attached-cust-points">650</span></p>
+                                </div>
+                                <button class="btn-detach" id="detach-customer-btn"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Cart Line Items -->
+                        <div class="cart-items-wrapper">
+                            <table class="cart-table">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th class="text-center">Qty</th>
+                                        <th class="text-right">Price</th>
+                                        <th class="text-right">Total</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cart-tbody">
+                                    <!-- Dynamic elements -->
+                                    <tr class="empty-cart-row"><td colspan="5" class="text-center">Cart is empty. Select items on the left.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Cart Totals Summary -->
+                        <div class="cart-summary">
+                            <div class="summary-line">
+                                <span>Subtotal</span>
+                                <span id="cart-subtotal">$0.00</span>
+                            </div>
+                            <div class="summary-line text-discount">
+                                <span>Loyalty Tier Discount</span>
+                                <span id="cart-discount">-$0.00</span>
+                            </div>
+                            <div class="summary-line">
+                                <span>VAT/Tax (8%)</span>
+                                <span id="cart-tax">$0.00</span>
+                            </div>
+                            <div class="summary-line net-total-line">
+                                <span>Amount Payable</span>
+                                <span id="cart-net">$0.00</span>
+                            </div>
+                        </div>
+
+                        <!-- Payment and Action -->
+                        <div class="cart-actions">
+                            <label class="label-heading">Payment Method</label>
+                            <div class="payment-selector">
+                                <label class="payment-option">
+                                    <input type="radio" name="payment-method" value="CARD" checked>
+                                    <div class="payment-box">
+                                        <i class="fa-regular fa-credit-card"></i>
+                                        <span>Card</span>
+                                    </div>
+                                </label>
+                                <label class="payment-option">
+                                    <input type="radio" name="payment-method" value="UPI">
+                                    <div class="payment-box">
+                                        <i class="fa-solid fa-mobile-screen-button"></i>
+                                        <span>UPI</span>
+                                    </div>
+                                </label>
+                                <label class="payment-option">
+                                    <input type="radio" name="payment-method" value="CASH">
+                                    <div class="payment-box">
+                                        <i class="fa-solid fa-money-bill-wave"></i>
+                                        <span>Cash</span>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <button class="btn btn-primary btn-block btn-lg" id="checkout-btn" disabled>
+                                <i class="fa-solid fa-cash-register"></i> Complete Checkout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Inventory Panel -->
+            <section id="inventory-panel" class="content-panel">
+                <div class="table-header-controls">
+                    <div class="search-input-group">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="inventory-search" placeholder="Search products by Name or SKU...">
+                    </div>
+                    <button class="btn btn-primary" id="btn-add-product">
+                        <i class="fa-solid fa-plus"></i> Add Product
+                    </button>
+                </div>
+
+                <div class="dashboard-card table-card">
+                    <div class="table-responsive">
+                        <table class="table" id="inventory-table">
+                            <thead>
+                                <tr>
+                                    <th>SKU</th>
+                                    <th>Product Name</th>
+                                    <th>Category</th>
+                                    <th class="text-right">Cost Price</th>
+                                    <th class="text-right">Retail Price</th>
+                                    <th class="text-center">Stock Level</th>
+                                    <th>Status</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Rendered dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Customers Panel -->
+            <section id="customers-panel" class="content-panel">
+                <div class="table-header-controls">
+                    <div class="search-input-group">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="customers-search" placeholder="Search members by Name or Phone...">
+                    </div>
+                    <button class="btn btn-primary" id="btn-add-customer">
+                        <i class="fa-solid fa-user-plus"></i> Register Member
+                    </button>
+                </div>
+
+                <div class="dashboard-card table-card">
+                    <div class="table-responsive">
+                        <table class="table" id="customers-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email Address</th>
+                                    <th>Phone Number</th>
+                                    <th class="text-center">Loyalty Points</th>
+                                    <th class="text-center">Loyalty Tier</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Rendered dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Order History Panel -->
+            <section id="orders-panel" class="content-panel">
+                <div class="table-header-controls">
+                    <div class="search-input-group">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="orders-search" placeholder="Filter orders by Order Number...">
+                    </div>
+                </div>
+
+                <div class="dashboard-card table-card">
+                    <div class="table-responsive">
+                        <table class="table" id="orders-table">
+                            <thead>
+                                <tr>
+                                    <th>Order Number</th>
+                                    <th>Customer / Profile</th>
+                                    <th>Order Date</th>
+                                    <th class="text-right">Total Amount</th>
+                                    <th class="text-right">Discount</th>
+                                    <th class="text-right">Net Paid</th>
+                                    <th>Payment</th>
+                                    <th>Status</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Rendered dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Product Add/Edit Modal -->
+    <div class="modal" id="product-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="product-modal-title">Add New Product</h3>
+                <button class="close-modal-btn">&times;</button>
+            </div>
+            <form id="product-form">
+                <input type="hidden" id="product-id">
+                <div class="form-row">
+                    <div class="form-group col-6">
+                        <label for="product-name">Product Name *</label>
+                        <input type="text" id="product-name" required placeholder="e.g. iPhone 15 Pro Max">
+                    </div>
+                    <div class="form-group col-6">
+                        <label for="product-sku">SKU Code *</label>
+                        <input type="text" id="product-sku" required placeholder="e.g. ELEC-IP15PM">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-12">
+                        <label for="product-desc">Description</label>
+                        <textarea id="product-desc" rows="2" placeholder="Describe the product details..."></textarea>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-6">
+                        <label for="product-category">Category *</label>
+                        <select id="product-category" required>
+                            <option value="">Select Category</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Apparel">Apparel</option>
+                            <option value="Home & Kitchen">Home & Kitchen</option>
+                            <option value="Grocery">Grocery</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-6">
+                        <label for="product-stock">Stock Quantity *</label>
+                        <input type="number" id="product-stock" min="0" required placeholder="e.g. 50">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-4">
+                        <label for="product-cost">Cost Price ($) *</label>
+                        <input type="number" id="product-cost" step="0.01" min="0" required placeholder="0.00">
+                    </div>
+                    <div class="form-group col-4">
+                        <label for="product-price">Retail Selling Price ($) *</label>
+                        <input type="number" id="product-price" step="0.01" min="0" required placeholder="0.00">
+                    </div>
+                    <div class="form-group col-4">
+                        <label for="product-threshold">Low Stock Threshold *</label>
+                        <input type="number" id="product-threshold" min="0" required placeholder="e.g. 5">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary close-modal-btn">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-save-product">Save Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Customer Registration Modal -->
+    <div class="modal" id="customer-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="customer-modal-title">Register Member</h3>
+                <button class="close-modal-btn">&times;</button>
+            </div>
+            <form id="customer-form">
+                <input type="hidden" id="customer-id">
+                <div class="form-group">
+                    <label for="customer-name">Full Name *</label>
+                    <input type="text" id="customer-name" required placeholder="e.g. John Doe">
+                </div>
+                <div class="form-group">
+                    <label for="customer-email">Email Address *</label>
+                    <input type="email" id="customer-email" required placeholder="e.g. john.doe@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="customer-phone">Phone Number *</label>
+                    <input type="tel" id="customer-phone" required placeholder="e.g. 9876543210">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary close-modal-btn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Member</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Digital Receipt Modal (Sliding / Realistic Printer Effect) -->
+    <div class="modal" id="receipt-modal">
+        <div class="receipt-container">
+            <div class="receipt-paper">
+                <div class="receipt-header">
+                    <h2 class="receipt-store-name">JOLO RETAIL CORP</h2>
+                    <p class="receipt-address">123 Developers Boulevard, Silicon Valley</p>
+                    <p class="receipt-contact">TEL: +1-555-JOLO-RETAIL</p>
+                    <div class="receipt-divider-dash"></div>
+                </div>
+                
+                <div class="receipt-meta">
+                    <p><span>ORDER #:</span> <span id="receipt-no">JOLO-XXXXXXXX-XXXX</span></p>
+                    <p><span>DATE:</span> <span id="receipt-date">--/--/---- --:--</span></p>
+                    <p><span>CASHIER:</span> <span>API-SIMULATOR-01</span></p>
+                    <p><span>CUSTOMER:</span> <span id="receipt-customer">Guest</span></p>
+                    <div class="receipt-divider-dash"></div>
+                </div>
+                
+                <div class="receipt-body">
+                    <table class="receipt-table">
+                        <thead>
+                            <tr>
+                                <th>Item Description</th>
+                                <th class="text-center">Qty</th>
+                                <th class="text-right">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="receipt-items-tbody">
+                            <!-- Populated Dynamically -->
+                        </tbody>
+                    </table>
+                    <div class="receipt-divider-dash"></div>
+                </div>
+                
+                <div class="receipt-totals">
+                    <p><span>SUBTOTAL</span> <span id="receipt-subtotal">$0.00</span></p>
+                    <p class="text-discount"><span>DISCOUNT</span> <span id="receipt-discount">-$0.00</span></p>
+                    <p><span>VAT/TAX (8.00%)</span> <span id="receipt-tax">$0.00</span></p>
+                    <div class="receipt-divider-dash"></div>
+                    <p class="receipt-net-total"><span>NET TOTAL</span> <span id="receipt-net">$0.00</span></p>
+                </div>
+
+                <div class="receipt-payment-info">
+                    <p><span>PAYMENT METHOD:</span> <span id="receipt-pay-method">CARD</span></p>
+                    <p><span>STATUS:</span> <span>COMPLETED</span></p>
+                    <div class="receipt-loyalty-earned hidden" id="receipt-loyalty-section">
+                        <div class="receipt-divider-dash"></div>
+                        <p class="text-center accent-text">*** LOYALTY MEMBER UPDATE ***</p>
+                        <p><span>PREVIOUS BALANCE:</span> <span id="receipt-prev-pts">0</span> pts</p>
+                        <p><span>POINTS EARNED THIS SALE:</span> <span id="receipt-earned-pts">0</span> pts</p>
+                        <p><span>NEW BALANCE:</span> <span id="receipt-new-pts">0</span> pts</p>
+                        <p><span>CURRENT STATUS TIER:</span> <span id="receipt-new-tier" class="accent-text">BRONZE</span></p>
+                    </div>
+                </div>
+                
+                <div class="receipt-footer">
+                    <div class="receipt-divider-dash"></div>
+                    <div class="barcode-svg-wrapper">
+                        <!-- Barcode Simulation -->
+                        <div class="barcode-stripe-container">
+                            <span class="barcode-line w-2"></span><span class="barcode-line w-1"></span>
+                            <span class="barcode-line w-4"></span><span class="barcode-line w-2"></span>
+                            <span class="barcode-line w-1"></span><span class="barcode-line w-3"></span>
+                            <span class="barcode-line w-2"></span><span class="barcode-line w-1"></span>
+                            <span class="barcode-line w-4"></span><span class="barcode-line w-2"></span>
+                            <span class="barcode-line w-1"></span><span class="barcode-line w-3"></span>
+                        </div>
+                        <span class="barcode-number">2026-602A97CA</span>
+                    </div>
+                    <p class="receipt-thanks">Thank you for shopping at JOLO!</p>
+                    <p class="receipt-slogan">We value your business</p>
+                </div>
+            </div>
+            
+            <div class="receipt-actions">
+                <button class="btn btn-secondary btn-block" id="btn-close-receipt">Close Receipt</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast System -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- App Logic Script -->
+    <script src="app.js"></script>
+</body>
+</html>
